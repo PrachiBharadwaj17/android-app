@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.dell_pc.libraryproject">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/carwashlogo"
+        android:label="Carwash App"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".Bookingupdate"></activity>
+        <activity android:name=".Viewitems" />
+        <activity android:name=".Updatestatus" />
+        <activity android:name=".Viewcart" />
+        <activity android:name=".Booking" />
+        <activity android:name=".Addcategory" />
+        <activity android:name=".Adminhome" />
+        <activity android:name=".Adminlogin" />
+        <activity android:name=".Viewordersdet" />
+        <activity android:name=".Viewservice" />
+        <activity android:name=".Userreg" />
+        <activity android:name=".userlogin" />
+        <activity android:name=".Loginmain" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
+        <activity android:name=".Userhome" />
+    </application>
+
+</manifest>

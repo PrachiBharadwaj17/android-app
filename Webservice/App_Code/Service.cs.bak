@@ -1,0 +1,723 @@
+﻿using System;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.Services.Protocols;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using System.IO;
+using System.Data;
+using System.Net;
+[WebService(Namespace = "http://tempuri.org/")]
+[WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+// To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
+// [System.Web.Script.Services.ScriptService]
+public class Service : System.Web.Services.WebService
+{
+    SqlConnection con = new SqlConnection("server=.\\sqlexpress;database=Carwash;Integrated security=true;");
+    SqlCommand cmd;
+    String Cdate;
+    string uname; 
+    string addr;
+    string mob, ordermastid;
+    public Service()
+    {
+
+        //Uncomment the following line if using designed components 
+        //InitializeComponent(); 
+    }
+
+    [WebMethod]
+    public String userlogin(String Staffid, String pwd)
+    {
+        String s = "";
+        if (con.State == ConnectionState.Closed)
+            con.Open();
+
+        cmd = new SqlCommand("select * from Newuser where Userid='" + Staffid + "' and Pwd='" + pwd + "'", con);
+        SqlDataReader dr = cmd.ExecuteReader();
+        if (dr.Read())
+        {
+            s = "ok," + dr[1].ToString();
+        }
+        else
+        {
+            s = "not OK,not OK";
+        }
+        dr.Close();
+        return s;
+    }
+
+
+    
+    [WebMethod]
+    public Boolean Newuser(String Userid, String Username, String Pwd, String Addr, String Mob, String Email)
+    {
+        Boolean boolResult = false;
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("insert into Newuser values('" + Userid + "','" + Username + "','" + Pwd + "','" + Addr + "','" + Mob + "','" + Email + "')", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        boolResult = true;
+        return boolResult;
+    }
+
+    [WebMethod]
+    public Boolean Addservice(String Servicename, String Price, String Description)
+    {
+        Boolean boolResult = false;
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("insert into Addservice values('" + Servicename + "','" + Price + "','" + Description + "')", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        boolResult = true;
+        return boolResult;
+    }
+
+
+    
+
+    [WebMethod]
+    public String selectservice(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Addservice", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+
+    [WebMethod]
+    public String Viewser(String Servid)
+    {
+        String s = "";
+        if (con.State == ConnectionState.Closed)
+            con.Open();
+
+        cmd = new SqlCommand("select * from Addservice where Sid='" + Servid + "'", con);
+        SqlDataReader dr = cmd.ExecuteReader();
+        if (dr.Read())
+        {
+            s = "ok," + dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString();
+        }
+        else
+        {
+            s = "not OK";
+        }
+        dr.Close();
+        return s;
+    }
+
+    [WebMethod]
+    public Boolean Booking(String Sid, String Servicename, String Price, String Description, String Bdate, String Userid)
+    {
+        Boolean boolResult = false;
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("insert into Booking values('" + Sid + "','" + Servicename + "','" + Price + "','" + Description + "','" + Bdate + "','" + Userid + "','Confirmed')", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        boolResult = true;
+        return boolResult;
+    }
+
+    [WebMethod]
+    public String Viewbook(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Booking where Userid='" + res + "'", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "," + dr[6].ToString() + "," + dr[7].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public Boolean cancelbook(String Bid)
+    {
+        Boolean boolResult = false;
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("update Booking set Status='Cancel' where Bid='" + Bid + "'", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        boolResult = true;
+        return boolResult;
+    }
+
+
+    [WebMethod]
+    public String Viewservice(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Addservice", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public String Deleteitem(String res)
+    {
+        String s = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("Delete from Addservice where Sid='" + res + "'", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        s = "ok";
+        return s;
+    }
+
+
+    [WebMethod]
+    public string Viewbooking(string res)
+    {
+
+        string Result = "";
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Booking", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "," + dr[6].ToString() + "," + dr[7].ToString() + "#";
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+    }
+
+
+    [WebMethod]
+    public string vusersdet(string res)
+    {
+
+        string Result = "";
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Newuser", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "#";
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+    }
+
+
+    [WebMethod]
+    public String Viewitems(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Item where Bakersid='" + res + "'", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+
+   
+
+    [WebMethod]
+    public String Viewitems1(String bakery, String cate)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Item where Category='" + cate + "' and Bakersid='" + bakery + "'", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+
+    
+
+    [WebMethod]
+    public String Deletecart(String res)
+    {
+        String s = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("Delete from Cart where Cartid='" + res + "'", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        s = "ok";
+        return s;
+    }
+
+    
+
+    [WebMethod]
+    public String Orderdet(String res)
+    {
+       
+        String s = "";
+        if (con.State == System.Data.ConnectionState.Closed)
+            con.Open();
+
+        cmd = new SqlCommand("select * from Cart where Userid='" + res + "'", con);
+        SqlDataReader dr = cmd.ExecuteReader();
+        if (dr.Read())
+        {
+            dr.Close();
+            cmd = new SqlCommand("select Username,Addr,Mob from Newuser where Userid='" + res + "'", con);
+            SqlDataAdapter da1 = new SqlDataAdapter(cmd);
+            DataSet ds1 = new DataSet();
+            da1.Fill(ds1);
+            if (ds1.Tables.Count > 0 && ds1.Tables[0].Rows.Count > 0)
+            {
+                uname = ds1.Tables[0].Rows[0]["Username"].ToString();
+                addr = ds1.Tables[0].Rows[0]["Addr"].ToString();
+                mob = ds1.Tables[0].Rows[0]["Mob"].ToString();
+
+            }
+
+            cmd = new SqlCommand("select sum(Total)+5 from Cart where Userid='" + res + "'", con);
+            String tot = cmd.ExecuteScalar().ToString();
+
+            cmd = new SqlCommand("select Bakersid from Cart where Userid='" + res + "'", con);
+            String bakid = cmd.ExecuteScalar().ToString();
+
+            string cmins = "insert into ordermaster values('" + System.DateTime.Now.ToShortDateString() + "','" + res + "','" + uname + "','" + addr + "','" + mob + "','" + tot + "','" + bakid + "','Pending')";
+            cmd = new SqlCommand(cmins, con);
+            cmd.ExecuteNonQuery();
+
+            cmd = new SqlCommand("select max(ordermastid) from ordermaster where Userid='" + res + "'", con);
+            ordermastid = cmd.ExecuteScalar().ToString();
+
+
+            cmd = new SqlCommand("select * from Cart where Userid='" + res + "'", con);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            for (int j = 0; j < ds.Tables[0].Rows.Count; j++)
+            {
+
+                string cmins1 = "insert into orderdetail values('" + ordermastid + "','" + ds.Tables[0].Rows[j][1].ToString() + "','" + ds.Tables[0].Rows[j][2].ToString() + "','" + ds.Tables[0].Rows[j][3].ToString() + "','" + ds.Tables[0].Rows[j][4].ToString() + "','" + ds.Tables[0].Rows[j][5].ToString() + "','" + ds.Tables[0].Rows[j][6].ToString() + "','" + ds.Tables[0].Rows[j][7].ToString() + "')";
+                cmd = new SqlCommand(cmins1, con);
+                cmd.ExecuteNonQuery();
+
+            }
+
+           cmd = new SqlCommand("Delete from Cart where Userid='" + res + "'", con);
+           cmd.ExecuteNonQuery();
+
+            con.Close();
+            s = "ok";
+           
+        
+        }
+        else
+        {
+            dr.Close();
+            s = "not OK";
+           
+        }
+        dr.Close();
+        con.Close();
+        return s;
+    }
+
+
+    [WebMethod]
+    public String Totcart(String res)
+    {
+        String s = "";
+        if (con.State == ConnectionState.Closed)
+            con.Open();
+
+        cmd = new SqlCommand("select sum(Total)+5 from Cart where Userid='" + res + "'", con);
+        SqlDataReader dr = cmd.ExecuteReader();
+        if (dr.Read())
+        {
+            s = "ok," + dr[0].ToString();
+        }
+        else
+        {
+            s = "not OK,not OK";
+        }
+        dr.Close();
+        return s;
+    }
+
+    [WebMethod]
+    public String Totorder(String res)
+    {
+        String s = "";
+        if (con.State == ConnectionState.Closed)
+            con.Open();
+
+        cmd = new SqlCommand("select Count(*) from ordermaster where Bakersid='" + res + "'", con);
+        SqlDataReader dr = cmd.ExecuteReader();
+        if (dr.Read())
+        {
+            s = "ok," + dr[0].ToString();
+        }
+        else
+        {
+            s = "not OK,not OK";
+        }
+        dr.Close();
+        return s;
+    }
+
+    [WebMethod]
+    public String Viewreq(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Jobrequest where Seekerid='" + res + "'", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "," + dr[6].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+
+    [WebMethod]
+    public String Viewseeker(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Newseeker where Userid='" + res + "'", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public String Bookhere(String Requser, String Seekerid, String Jobdesc)
+    {
+        String s = "";
+        if (con.State == ConnectionState.Closed)
+            con.Open();  
+            cmd = new SqlCommand("insert into Jobrequest values('" + Requser + "','" + Seekerid + "','" + Jobdesc + "','" + System.DateTime.Now.ToShortDateString() + "','Request','null')", con);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            s = "ok";
+            return s;
+    }
+
+
+    [WebMethod]
+    public String Viewpayment(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Payment where Userid='"+ res +"'", con);
+        //cmd = new SqlCommand("select * from Attendance", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    
+   
+    
+    [WebMethod]
+    public String Authenticatebakers(String Staffid, String pwd)
+    {
+        String s = "";
+        if (con.State == ConnectionState.Closed)
+            con.Open();
+
+        cmd = new SqlCommand("select * from Newbakers where Userid='" + Staffid + "' and Pwd='" + pwd + "'", con);
+        SqlDataReader dr = cmd.ExecuteReader();
+        if (dr.Read())
+        {
+            s = "ok," + dr[1].ToString();
+        }
+        else
+        {
+            s = "not OK,not OK";
+        }
+        dr.Close();
+        return s;
+    }
+
+
+
+    [WebMethod]
+    public Boolean Newbakers(String Userid, String Username, String Pwd, String Addr, String Mob, String Email)
+    {
+        Boolean boolResult = false;
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("insert into Newbakers values('" + Userid + "','" + Username + "','" + Pwd + "','" + Addr + "','" + Mob + "','" + Email + "')", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        boolResult = true;
+        return boolResult;
+    }
+
+    [WebMethod]
+    public Boolean Addtocarts(String Iid, String Itemname, String Category, String Price, String Qty, String Total, String Bakersid, String Userid)
+    {
+        Boolean boolResult = false;
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("insert into Cart values('" + Iid + "','" + Itemname + "','" + Category + "','" + Price + "','" + Qty + "','" + Total + "','" + Bakersid + "','" + Userid + "')", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        boolResult = true;
+        return boolResult;
+    }
+
+    [WebMethod]
+    public Boolean payhere(String Userid, String seekerid, String amt)
+    {
+        Boolean boolResult = false;
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("insert into Payment values('" + Userid + "','" + seekerid + "','" + amt + "','" + System.DateTime.Now.ToShortDateString() + "')", con);
+        cmd.ExecuteNonQuery();
+        con.Close();
+        boolResult = true;
+        return boolResult;
+    }
+
+
+   
+
+    [WebMethod]
+    public string vstatus(string res)
+    {
+
+        string Result = "";
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Jobrequest where Requser='" + res + "'", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "," + dr[6].ToString() + "#";
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+    }
+
+    [WebMethod]
+    public string vpay(string res)
+    {
+
+        string Result = "";
+
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select * from Payment where Seekerid='" + res + "'", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "#";
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+    }
+
+
+   
+
+    
+
+    [WebMethod]
+    public String catedetails(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select Category from Categorytbl", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public String Ordermaster(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select ordermastid from ordermaster where Userid='"+ res +"'", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public String Viewbill(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select ordermastid from ordermaster where Bakersid='" + res + "'", con);
+       // cmd = new SqlCommand("select ordermastid from ordermaster", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public String Viewbaker(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("select Userid from Newbakers", con);
+        // cmd = new SqlCommand("select ordermastid from ordermaster", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+            Result += dr[0].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public String Vieworders(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("SELECT a.ordermastid, a.orderdate, a.totamt, a.Status, b.Iid, b.Itemname, b.Category, b.price, b.qty, b.amt, b.Bakersid FROM ordermaster a INNER JOIN orderdetail b ON a.ordermastid = b.ordermastid WHERE a.ordermastid='"+ res +"'", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+           
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "," + dr[6].ToString() + "," + dr[7].ToString() + "," + dr[8].ToString() + "," + dr[9].ToString() + "," + dr[10].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    [WebMethod]
+    public String Viewordersall(String res)
+    {
+        String Result = "";
+        if (con.State == System.Data.ConnectionState.Closed) con.Open();
+        cmd = new SqlCommand("SELECT a.ordermastid, a.orderdate,a.Userid,a.username,a.Addr,a.mobile, a.totamt, a.Status, b.Iid, b.Itemname, b.Category, b.price, b.qty, b.amt FROM ordermaster a INNER JOIN orderdetail b ON a.ordermastid = b.ordermastid WHERE a.ordermastid='" + res + "'", con);
+        SqlDataReader dr;
+        dr = cmd.ExecuteReader();
+        while (dr.Read())
+        {
+
+            Result += dr[0].ToString() + "," + dr[1].ToString() + "," + dr[2].ToString() + "," + dr[3].ToString() + "," + dr[4].ToString() + "," + dr[5].ToString() + "," + dr[6].ToString() + "," + dr[7].ToString() + "," + dr[8].ToString() + "," + dr[9].ToString() + "," + dr[10].ToString() + "," + dr[11].ToString() + "," + dr[12].ToString() + "," + dr[13].ToString() + "#";
+
+        }
+        dr.Close();
+        con.Close();
+        return Result;
+
+    }
+
+    
+}

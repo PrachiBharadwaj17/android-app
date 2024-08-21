@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">OPAC</string>
+    <string name="title_activity_usermain">Usermain</string>
+
+    <string-array name="course_arrays">
+        <item>Order Confirm</item>
+        <item>Deliverd</item>
+
+    </string-array>
+</resources>
